@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vaultify | Secure Document Fortress</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #0a0e27; color: #e2e8f0; overflow: hidden; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .glass-card { background: rgba(51, 65, 85, 0.4); backdrop-filter: blur(8px); border: 1px solid rgba(148, 163, 184, 0.1); transition: all 0.3s ease; }
+        .glass-card:hover { background: rgba(51, 65, 85, 0.6); border-color: rgba(56, 189, 248, 0.3); transform: translateY(-2px); }
+        .scan-line { position: absolute; left: 0; right: 0; height: 2px; background: linear-gradient(to right, transparent, #06b6d4, transparent); animation: scan 3s linear infinite; }
+        @keyframes scan { 0% { top: 0%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
+        .drop-zone.active { border-color: #06b6d4; background: rgba(6, 182, 212, 0.1); }
+    </style>
+</head>
+<body class="h-screen bg-slate-950">
+
+    <div class="flex h-full">
+        <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col z-20">
+            <div class="p-6 border-b border-slate-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 flex items-center justify-center bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl shadow-lg">
+                        <i data-lucide="shield-check" class="w-6 h-6 text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-white">Vaultify</h1>
+                        <p class="text-xs text-slate-400 font-mono">B1-SECURE</p>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="flex-1 p-4 space-y-2">
+                <button onclick="switchView('dashboard')" data-view="dashboard" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-white bg-slate-800 transition-all">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5 text-cyan-400"></i>
+                    <span class="font-medium">Dashboard</span>
+                </button>
+                <button onclick="switchView('vault')" data-view="vault" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-all">
+                    <i data-lucide="folder-lock" class="w-5 h-5"></i>
+                    <span class="font-medium">My Vault</span>
+                </button>
+                <button onclick="switchView('activity')" data-view="activity" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-all">
+                    <i data-lucide="activity" class="w-5 h-5"></i>
+                    <span class="font-medium">Audit Log</span>
+                </button>
+            </nav>
+
+            <div class="p-4 border-t border-slate-800">
+                <div class="glass-panel rounded-lg p-4 relative overflow-hidden">
+                    <div class="scan-line"></div>
+                    <span class="text-xs font-mono text-emerald-400">ENCRYPTION ACTIVE</span>
+                </div>
+            </div>
+        </aside>
+
+        <main class="flex-1 flex flex-col h-full overflow-hidden">
+            <header class="h-16 border-b border-slate-800 bg-slate-900/50 backdrop-blur-xl flex items-center justify-between px-8">
+                <h2 id="page-title" class="text-lg font-semibold text-white">Dashboard</h2>
+                <div class="flex items-center gap-4">
+                    <span id="status-tag" class="text-xs font-mono text-slate-500">SERVER: OFFLINE</span>
+                    <div class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs">AC</div>
+                </div>
+            </header>
+
+            <div id="content-area" class="flex-1 overflow-y-auto p-8">
+                
+                <div id="view-dashboard" class="view-section space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="glass-card rounded-xl p-6">
+                            <p class="text-sm text-slate-400">Security Status</p>
+                            <h3 class="text-2xl font-bold text-emerald-400">Protected</h3>
+                        </div>
+                        <div class="glass-card rounded-xl p-6">
+                            <p class="text-sm text-slate-400">Vault Health</p>
+                            <h3 class="text-2xl font-bold text-cyan-400">100%</h3>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel rounded-xl p-12 text-center border-dashed border-2 border-slate-700 drop-zone" id="drop-zone">
+                        <input type="file" id="file-input" class="hidden" multiple>
+                        <i data-lucide="upload-cloud" class="w-12 h-12 text-cyan-500 mx-auto mb-4"></i>
+                        <h3 class="text-xl font-bold text-white">Drag & Drop to Encrypt</h3>
+                        <p class="text-slate-400 mb-6">Files are encrypted locally before being vaulted</p>
+                        <button onclick="document.getElementById('file-input').click()" class="px-6 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg transition-all">Select Files</button>
+                    </div>
+                </div>
+
+                <div id="view-vault" class="view-section hidden space-y-6">
+                    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4" id="file-grid">
+                        <div class="glass-card rounded-xl p-4 text-center">
+                            <p class="text-slate-500 text-sm">No files uploaded yet.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-activity" class="view-section hidden">
+                    <div class="glass-panel rounded-xl overflow-hidden">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-800 text-slate-400">
+                                <tr>
+                                    <th class="p-4">Event</th>
+                                    <th class="p-4">Status</th>
+                                    <th class="p-4">Timestamp</th>
+                                </tr>
+                            </thead>
+                            <tbody id="log-table">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+const API_URL = 'http://localhost:3000/api';
+
+// --- View Navigation ---
+function switchView(viewId) {
+    // 1. Update UI Elements
+    document.querySelectorAll('.view-section').forEach(v => v.classList.add('hidden'));
+    document.getElementById(`view-${viewId}`).classList.remove('hidden');
+    document.getElementById('page-title').innerText = viewId.charAt(0).toUpperCase() + viewId.slice(1);
+    
+    // 2. Update Nav Buttons
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('bg-slate-800', 'text-white');
+        btn.classList.add('text-slate-400');
+    });
+    const activeBtn = document.querySelector(`[data-view="${viewId}"]`);
+    if(activeBtn) activeBtn.classList.add('bg-slate-800', 'text-white');
+
+    // 3. Trigger View-Specific Loads
+    if (viewId === 'vault') loadVault();
+    if (viewId === 'activity') loadLogs();
+}
+
+// --- Vault Management ---
+async function loadVault() {
+    const grid = document.getElementById('file-grid');
+    grid.innerHTML = '<div class="col-span-full py-10 text-center animate-pulse text-slate-500">Accessing encrypted storage...</div>';
+    
+    try {
+        const res = await fetch(`${API_URL}/files`);
+        const files = await res.json();
+        
+        if (!files || files.length === 0) {
+            grid.innerHTML = '<p class="col-span-full text-slate-500 text-center py-10">Vault is empty.</p>';
+            return;
+        }
+
+        grid.innerHTML = files.map(file => `
+            <div class="glass-card rounded-xl p-4 flex flex-col items-center gap-3 group">
+                <div class="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center">
+                    <i data-lucide="file-text" class="text-cyan-400"></i>
+                </div>
+                <div class="text-center overflow-hidden w-full">
+                    <p class="text-xs font-medium text-white truncate px-2" title="${file.display}">${file.display}</p>
+                    <p class="text-[10px] text-slate-500 font-mono mt-1">AES-256</p>
+                </div>
+                <button onclick="downloadFile('${file.secure}')" class="mt-2 text-[10px] bg-cyan-600/20 text-cyan-400 border border-cyan-600/30 px-3 py-1 rounded hover:bg-cyan-600 hover:text-white transition-all">
+                    DECRYPT
+                </button>
+            </div>
+        `).join('');
+        
+        lucide.createIcons();
+    } catch (err) {
+        grid.innerHTML = '<p class="col-span-full text-red-400 text-center py-10">Failed to connect to Vault.</p>';
+    }
+}
+
+// --- File Handling (Upload & Download) ---
+async function handleFiles(files) {
+    if (files.length === 0) return;
+
+    for (let file of files) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const res = await fetch(`${API_URL}/upload`, { method: 'POST', body: formData });
+            if (res.ok) {
+                // Refresh if we are currently looking at the vault
+                if (!document.getElementById('view-vault').classList.contains('hidden')) {
+                    loadVault();
+                } else {
+                    alert(`${file.name} successfully encrypted to vault.`);
+                }
+            }
+        } catch (err) {
+            alert("Upload failed. Server may be offline.");
+        }
+    }
+}
+
+function downloadFile(secureFileName) {
+    // Direct link to the API download endpoint
+    window.location.href = `${API_URL}/download/${secureFileName}`;
+}
+
+// --- Utility Functions ---
+async function checkServer() {
+    const statusTag = document.getElementById('status-tag');
+    try {
+        const res = await fetch(`${API_URL}/logs`);
+        if (res.ok) {
+            statusTag.innerText = "SERVER: ONLINE";
+            statusTag.classList.replace('text-slate-500', 'text-emerald-400');
+        }
+    } catch (e) {
+        statusTag.innerText = "SERVER: OFFLINE";
+        statusTag.classList.replace('text-emerald-400', 'text-slate-500');
+    }
+}
+
+// --- Event Listeners ---
+const dropZone = document.getElementById('drop-zone');
+const fileInput = document.getElementById('file-input');
+
+fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('active'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('active'));
+dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('active');
+    handleFiles(e.dataTransfer.files);
+});
+
+// Initialization
+checkServer();
+setInterval(checkServer, 10000); // Check status every 10s
+// --- Audit Log Management ---
+async function loadLogs() {
+    const logTable = document.getElementById('log-table');
+    logTable.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-slate-500 animate-pulse">Retrieving security logs...</td></tr>';
+    
+    try {
+        const res = await fetch(`${API_URL}/logs`);
+        const logs = await res.json();
+        
+        if (!logs || logs.length === 0) {
+            logTable.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-slate-500">No recent activity detected.</td></tr>';
+            return;
+        }
+
+        logTable.innerHTML = logs.map(log => `
+            <tr class="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors">
+                <td class="p-4 text-white font-medium">${log.event}</td>
+                <td class="p-4">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold ${log.status === 'SUCCESS' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}">
+                        ${log.status}
+                    </span>
+                </td>
+                <td class="p-4 text-slate-400 font-mono text-xs">${new Date(log.timestamp).toLocaleString()}</td>
+            </tr>
+        `).join('');
+    } catch (err) {
+        logTable.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-red-400">Security log link severed.</td></tr>';
+    }
+}
+
+// --- Enhanced Status Check ---
+// Update the original checkServer to also toggle the Dashboard card
+async function checkServer() {
+    const statusTag = document.getElementById('status-tag');
+    const securityHeader = document.querySelector('#view-dashboard h3'); // The "Protected" text
+    
+    try {
+        const res = await fetch(`${API_URL}/logs`);
+        if (res.ok) {
+            statusTag.innerText = "SERVER: ONLINE";
+            statusTag.classList.replace('text-slate-500', 'text-emerald-400');
+            if(securityHeader) {
+                securityHeader.innerText = "Protected";
+                securityHeader.className = "text-2xl font-bold text-emerald-400";
+            }
+        }
+    } catch (e) {
+        statusTag.innerText = "SERVER: OFFLINE";
+        statusTag.classList.replace('text-emerald-400', 'text-slate-500');
+        if(securityHeader) {
+            securityHeader.innerText = "Unsecured";
+            securityHeader.className = "text-2xl font-bold text-red-400";
+        }
+    }
+}
+</script>
+
+        
+                    
+        
+</body>
+</html>
